@@ -1,11 +1,11 @@
 'use client';
 
-import RegistrationForm from '../components/Form/registrationForm';
+import EnrollmentForm from '../components/Form/enrollmentForm.jsx';
 import styles from './page.module.css';
 export default function Registration() {
   return (
     <div className={styles.main}>
-      <RegistrationForm />
+      <EnrollmentForm />
     </div>
   );
 }

@@ -1,0 +1,28 @@
+
+.clock {
+    font-family: "Montserrat",  sans-serif;
+    font-style: normal;
+    font-optical-sizing: auto;
+    position: absolute;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 10vh;
+    left: 0;
+    right: 0;
+    text-align: center;
+    z-index: 1;
+    width: fit-content;
+    
+  
+  }
+
+.time{
+  font-size: 4vw;;
+  color: rgb(255, 255, 255);
+}
+.date{
+  font-size: 1.5vw;
+
+  font-weight: 400;
+  color: rgb(255, 255, 255);
+}

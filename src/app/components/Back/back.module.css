@@ -1,0 +1,33 @@
+.back{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 3vw;
+    height: 3vw;
+    background-color:white;
+    border: 1px solid var(--clr-secondary);
+    border-radius: 50%;
+    margin: 4vh;
+}
+.back:hover {
+    cursor: pointer;
+    background-color: var(--clr-primary);
+}
+.back:hover > .chevron {
+    background-color: white;
+} 
+.chevron {
+    position: absolute;
+    --s: 1vh;
+    /* control the shape (can be percentage) */
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    
+    height: 3vh;
+    aspect-ratio: 4/5;
+    clip-path: polygon(100% 0, calc(100% - var(--s)) 0, 0 50%, calc(100% - var(--s)) 100%, 100% 100%, var(--s) 50%);
+    background: var(--clr-primary);
+}
