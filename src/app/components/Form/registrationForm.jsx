@@ -3,22 +3,39 @@ import React from "react";
 import Select from "react-select";
 import "./form.css";
 import Back from "../Back/Back";
+import  getUsers, { addUser, dbConnect }  from "../../utils/database";
 
 const RegistrationForm = () => {
   const gender = [
     { value: "male", label: "Male" },
     { value: "female", label: "Female" },
   ];
+  const  onSubmit =  async (e) =>{
+    e.preventDefault();
+    const data = {
+      'name': e.target.name.value,
+      'phone' : e.target.phone.value,
+      'gender' : e.target.gender.value,
+      'dob' : e.target.dob.value,
+      'photo' : e.target.photo.files[0],
+      'anumber' : e.target.anumber.value,
+      'aadhar' : e.target.aadhar.files[0],
+      'date' : new Date().toISOString(),
+    }
+    addUser(data);
+    
+  }
   return (
     <div className="wrapper">
       <Back />
-      <form className="container">
+      <form className="container" name="registration" onSubmit={onSubmit}>
         <h1>Registration Form</h1>
         <div className="column">
           <h3>Personal Details</h3>
-          <input type="text" placeholder="Full Name" />
-          <input type="number" placeholder="Mobile Number" />
-          <Select
+          <input type="text" required name="name" placeholder="Full Name" />
+          <input type="number" required name="phone" placeholder="Mobile Number" />
+          <Select form="registration" required
+                  name="gender"
                   isSearchable={false}
                   placeholder="Gender"
                   unstyled={true}
@@ -30,17 +47,18 @@ const RegistrationForm = () => {
             <div className="column">
               <h3>Date of Birth</h3>
               <div class="row">
-                <input type="date" placeholder="DD" />
+                <input type="date" required name="dob" placeholder="DD" />
               </div>
             </div>
             <div className="column">
               <h3>Upload Photo</h3>
               <div class="row">
-                <input
+                <input required
                   placeholder="Photo"
                   type="file"
                   className="input-fields"
-                  id="photo"
+                  
+                  name="photo"
                 />
               </div>
             </div>
@@ -48,14 +66,16 @@ const RegistrationForm = () => {
           </div>
 
           <h3>Aadhar Details</h3>
-          <input type="number" placeholder="Aadhar Number" />
+          <input type="number" name="anumber" placeholder="Aadhar Number" />
 
           <h3>Aadhar Upload</h3>
           <input
             placeholder="Aadhar"
             type="file"
+            name="aadhar" 
+            required
             className="input-fields"
-            id="photo"
+            
           />
 
           <button type="submit">Submit</button>

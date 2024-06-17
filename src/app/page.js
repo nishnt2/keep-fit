@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import logo from '../../public/assets/logo.webp'
 import Clock from './components/Clock/Clock'
+import {getUsers} from './utils/user'
 export default function Home() {
   return (
   <main className={styles.main} style={{
