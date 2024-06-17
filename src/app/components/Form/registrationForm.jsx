@@ -1,82 +1,176 @@
-import React from "react";
-// import { useForm, Controller } from "react-hook-form";
-import Select from "react-select";
-import "./form.css";
-import Back from "../Back/Back";
-import  getUsers, { addUser, dbConnect }  from "../../utils/database";
+import React, { useEffect } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import Select from 'react-select';
+import './form.css';
+import Back from '../Back/Back';
+
+import getUsers, { addUser, dbConnect } from '../../utils/database';
+import DatePicker from 'react-datepicker';
+
+import 'react-datepicker/dist/react-datepicker.css';
 
 const RegistrationForm = () => {
-  const gender = [
-    { value: "male", label: "Male" },
-    { value: "female", label: "Female" },
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    control,
+    watch,
+    formState: { errors },
+  } = useForm();
+
+  const genderOptions = [
+    { value: 'male', label: 'Male' },
+    { value: 'female', label: 'Female' },
   ];
-  const  onSubmit =  async (e) =>{
+
+  const genderValue = watch('gender');
+  const validateDateOfBirth = (value) => {
+    const selectedDate = new Date(value);
+    const today = new Date();
+    const age = today.getFullYear() - selectedDate.getFullYear();
+    const monthDiff = today.getMonth() - selectedDate.getMonth();
+    const dayDiff = today.getDate() - selectedDate.getDate();
+
+    if (selectedDate > today) {
+      return 'Date of Birth cannot be a future date';
+    }
+
+    if (
+      age < 12 ||
+      (age === 12 && (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)))
+    ) {
+      return 'Age must be at least 12 years';
+    }
+
+    return true;
+  };
+
+  const onSubmit = async (e) => {
     e.preventDefault();
     const data = {
-      'name': e.target.name.value,
-      'phone' : e.target.phone.value,
-      'gender' : e.target.gender.value,
-      'dob' : e.target.dob.value,
-      'photo' : e.target.photo.files[0],
-      'anumber' : e.target.anumber.value,
-      'aadhar' : e.target.aadhar.files[0],
-      'date' : new Date().toISOString(),
-    }
+      name: e.target.name.value,
+      phone: e.target.phone.value,
+      gender: e.target.gender.value,
+      dob: e.target.dob.value,
+      photo: e.target.photo.files[0],
+      anumber: e.target.anumber.value,
+      aadhar: e.target.aadhar.files[0],
+      date: new Date().toISOString(),
+    };
     addUser(data);
-    
-  }
+  };
+
+  useEffect(() => {
+    if (!genderValue) register('gender', { required: 'Please select gender' });
+  }, [register, genderValue]);
+  console.log({ errors, genderValue });
   return (
     <div className="wrapper">
       <Back />
-      <form className="container" name="registration" onSubmit={onSubmit}>
+      <form
+        className="container"
+        name="registration"
+        onSubmit={handleSubmit(onSubmit)}
+      >
         <h1>Registration Form</h1>
         <div className="column">
           <h3>Personal Details</h3>
-          <input type="text" required name="name" placeholder="Full Name" />
-          <input type="number" required name="phone" placeholder="Mobile Number" />
-          <Select form="registration" required
-                  name="gender"
-                  isSearchable={false}
-                  placeholder="Gender"
-                  unstyled={true}
-                  className="react-select-container"
-                  classNamePrefix="react-select"
-                  options={gender}
-                />
-          <div className="row">
+          <input
+            type="text"
+            placeholder="Full Name"
+            {...register('name', { required: 'Full Name is required' })}
+          />
+          {errors.name && <p className="errormsg">{errors.name.message}</p>}
+
+          <input
+            type="text"
+            placeholder="Mobile Number"
+            minLength={10}
+            maxLength={10}
+            {...register('phone', {
+              required: 'Mobile Number is required',
+              pattern: {
+                value: /^\d+$/,
+                message: 'Mobile Number must contain only digits',
+              },
+              minLength: {
+                value: 10,
+                message: 'Mobile Number must be at least 10 digits',
+              },
+            })}
+          />
+          {errors.phone && <p className="errormsg">{errors.phone.message}</p>}
+
+          <Select
+            options={genderOptions}
+            placeholder="Gender"
+            isSearchable={false}
+            className="react-select-container"
+            classNamePrefix="react-select"
+            onChange={(option) => setValue('gender', option.value)}
+          />
+          {errors.gender && <p className="errormsg">{errors.gender.message}</p>}
+
+          <div className="row" style={{ gap: '8px' }}>
             <div className="column">
               <h3>Date of Birth</h3>
-              <div class="row">
-                <input type="date" required name="dob" placeholder="DD" />
-              </div>
+              <Controller
+                control={control}
+                name="dob"
+                rules={{
+                  required: 'Date of Birth is required',
+                  validate: validateDateOfBirth,
+                }}
+                render={({ field }) => (
+                  <DatePicker
+                    placeholderText="Select date"
+                    onChange={(date) => field.onChange(date)}
+                    selected={field.value}
+                    dateFormat="dd/MM/yyyy"
+                    className="input"
+                  />
+                )}
+              />
+              {errors.dob && <p className="errormsg">{errors.dob.message}</p>}
             </div>
             <div className="column">
               <h3>Upload Photo</h3>
-              <div class="row">
-                <input required
-                  placeholder="Photo"
-                  type="file"
-                  className="input-fields"
-                  
-                  name="photo"
-                />
-              </div>
+              <input
+                type="file"
+                {...register('photo', { required: 'Photo is required' })}
+              />
+              {errors.photo && (
+                <p className="errormsg">{errors.photo.message}</p>
+              )}
             </div>
-            
           </div>
 
           <h3>Aadhar Details</h3>
-          <input type="number" name="anumber" placeholder="Aadhar Number" />
-
+          <input
+            type="text"
+            minLength={12}
+            maxLength={12}
+            placeholder="Aadhar Number"
+            {...register('anumber', {
+              required: 'Aadhar Number is required',
+              pattern: {
+                value: /^\d+$/,
+                message: 'Aadhar Number must contain only digits',
+              },
+              minLength: {
+                value: 12,
+                message: 'Aadhar Number must be at least 12 digits',
+              },
+            })}
+          />
+          {errors.photo && <p className="errormsg">{errors.anumber.message}</p>}
           <h3>Aadhar Upload</h3>
           <input
-            placeholder="Aadhar"
             type="file"
-            name="aadhar" 
-            required
-            className="input-fields"
-            
+            {...register('aadhar', { required: 'Aadhar is required' })}
           />
+          {errors.aadhar && <p className="errormsg">{errors.aadhar.message}</p>}
 
           <button type="submit">Submit</button>
         </div>
