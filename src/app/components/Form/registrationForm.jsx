@@ -3,8 +3,8 @@ import { Controller, useForm } from 'react-hook-form';
 import Select from 'react-select';
 import './form.css';
 import Back from '../Back/Back';
-
-import getUsers, { addUser, dbConnect } from '../../utils/database';
+import {createBase, writeFile} from '../../utils/fs'
+import addUser from '../../utils/database';
 import DatePicker from 'react-datepicker';
 
 import 'react-datepicker/dist/react-datepicker.css';
@@ -46,25 +46,28 @@ const RegistrationForm = () => {
     return true;
   };
 
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    const data = {
-      name: e.target.name.value,
-      phone: e.target.phone.value,
-      gender: e.target.gender.value,
-      dob: e.target.dob.value,
-      photo: e.target.photo.files[0],
-      anumber: e.target.anumber.value,
-      aadhar: e.target.aadhar.files[0],
+  const onSubmit = async (data, e) => {
+    
+    const param = {
+      id : data.name +"-"+data. anumber,
+      name: data.name,
+      phone: data.phone,
+      gender: data.gender,
+      dob: data.dob,
+      photo: data.photo[0],
+      anumber: data.anumber,
+      aadhar: data.aadhar[0],
       date: new Date().toISOString(),
     };
-    addUser(data);
+
+    console.log(data);
+    addUser(param);
   };
 
   useEffect(() => {
     if (!genderValue) register('gender', { required: 'Please select gender' });
   }, [register, genderValue]);
-  console.log({ errors, genderValue });
+  // console.log({ errors, genderValue });
   return (
     <div className="wrapper">
       <Back />
@@ -124,6 +127,7 @@ const RegistrationForm = () => {
                 }}
                 render={({ field }) => (
                   <DatePicker
+                    showYearPicker={true}
                     placeholderText="Select date"
                     onChange={(date) => field.onChange(date)}
                     selected={field.value}
